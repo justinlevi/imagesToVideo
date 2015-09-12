@@ -12,14 +12,24 @@ class ViewController: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    // Do any additional setup after loading the view, typically from a nib.
+    
+    let path = NSBundle.mainBundle().pathForResource("hasselblad-01", ofType: "jpg")!
+    
+    var photosArray = [String]()
+    for _ in 0...30 {
+      photosArray.append(path)
+    }
+    
+    let tlb = TimeLapseBuilder(photoURLs: photosArray)
+    tlb.build({ (progress) -> Void in
+      
+      }, success: { (url) -> Void in
+        print("SUCCESS: \(url)")
+      }) { (error) -> Void in
+        print(error)
+    }
+    
   }
-
-  override func didReceiveMemoryWarning() {
-    super.didReceiveMemoryWarning()
-    // Dispose of any resources that can be recreated.
-  }
-
 
 }
 

@@ -12,6 +12,8 @@
 		E2B7A36F1BA2050400E07D7A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E2B7A36D1BA2050400E07D7A /* Main.storyboard */; };
 		E2B7A3711BA2050400E07D7A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2B7A3701BA2050400E07D7A /* Assets.xcassets */; };
 		E2B7A3741BA2050400E07D7A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E2B7A3721BA2050400E07D7A /* LaunchScreen.storyboard */; };
+		E2B7A37C1BA2051800E07D7A /* TimeLapseBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2B7A37B1BA2051800E07D7A /* TimeLapseBuilder.swift */; settings = {ASSET_TAGS = (); }; };
+		E2FD8E571BA461CA00483FF6 /* hasselblad-01.jpg in Resources */ = {isa = PBXBuildFile; fileRef = E2FD8E561BA461CA00483FF6 /* hasselblad-01.jpg */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +24,8 @@
 		E2B7A3701BA2050400E07D7A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E2B7A3731BA2050400E07D7A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E2B7A3751BA2050400E07D7A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E2B7A37B1BA2051800E07D7A /* TimeLapseBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeLapseBuilder.swift; sourceTree = "<group>"; };
+		E2FD8E561BA461CA00483FF6 /* hasselblad-01.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "hasselblad-01.jpg"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,8 +58,10 @@
 		E2B7A3681BA2050400E07D7A /* ImagesToVideo */ = {
 			isa = PBXGroup;
 			children = (
+				E2FD8E561BA461CA00483FF6 /* hasselblad-01.jpg */,
 				E2B7A3691BA2050400E07D7A /* AppDelegate.swift */,
 				E2B7A36B1BA2050400E07D7A /* ViewController.swift */,
+				E2B7A37B1BA2051800E07D7A /* TimeLapseBuilder.swift */,
 				E2B7A36D1BA2050400E07D7A /* Main.storyboard */,
 				E2B7A3701BA2050400E07D7A /* Assets.xcassets */,
 				E2B7A3721BA2050400E07D7A /* LaunchScreen.storyboard */,
@@ -122,6 +128,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E2B7A3741BA2050400E07D7A /* LaunchScreen.storyboard in Resources */,
+				E2FD8E571BA461CA00483FF6 /* hasselblad-01.jpg in Resources */,
 				E2B7A3711BA2050400E07D7A /* Assets.xcassets in Resources */,
 				E2B7A36F1BA2050400E07D7A /* Main.storyboard in Resources */,
 			);
@@ -134,6 +141,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E2B7A37C1BA2051800E07D7A /* TimeLapseBuilder.swift in Sources */,
 				E2B7A36C1BA2050400E07D7A /* ViewController.swift in Sources */,
 				E2B7A36A1BA2050400E07D7A /* AppDelegate.swift in Sources */,
 			);
@@ -285,6 +293,7 @@
 				E2B7A37A1BA2050400E07D7A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
