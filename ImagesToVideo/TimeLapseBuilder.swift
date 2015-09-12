@@ -12,6 +12,9 @@ let kErrorDomain = "TimeLapseBuilder"
 let kFailedToStartAssetWriterError = 0
 let kFailedToAppendPixelBufferError = 1
 
+let kVideoWidth = 320
+let kVideoHeight = 240
+
 public class TimeLapseBuilder: NSObject {
   let photoURLs: [String]
   var videoWriter: AVAssetWriter?
@@ -21,12 +24,11 @@ public class TimeLapseBuilder: NSObject {
     
     super.init()
   }
-  
-  
+
   
   public func build(progress: (NSProgress -> Void), success: (NSURL -> Void), failure: (NSError -> Void)) {
-    let inputSize = CGSize(width: 320, height: 240)
-    let outputSize = CGSize(width: 320, height: 240)
+    let inputSize = CGSize(width: kVideoWidth, height: kVideoHeight)
+    let outputSize = CGSize(width: kVideoWidth, height: kVideoHeight)
     var error: NSError?
     
     let fileManager = NSFileManager.defaultManager()
@@ -54,6 +56,10 @@ public class TimeLapseBuilder: NSObject {
       AVVideoWidthKey  : NSNumber(float: Float(outputSize.width)),
       AVVideoHeightKey : NSNumber(float: Float(outputSize.height)),
     ]
+    
+    guard videoWriter.canApplyOutputSettings(outputSettings, forMediaType: AVMediaTypeVideo) else {
+      fatalError("Negative : Can't apply the Output settings...")
+    }
     
     let videoWriterInput = AVAssetWriterInput(mediaType: AVMediaTypeVideo, outputSettings: outputSettings)
     
@@ -131,6 +137,7 @@ public class TimeLapseBuilder: NSObject {
     }
   }
   
+  
   public func appendPixelBufferForImageAtURL(urlString: String, pixelBufferAdaptor: AVAssetWriterInputPixelBufferAdaptor, presentationTime: CMTime) -> Bool {
     var appendSucceeded = true
     
@@ -143,17 +150,17 @@ public class TimeLapseBuilder: NSObject {
             pixelBufferAdaptor.pixelBufferPool!,
             &pixelBuffer
           )
-          
+        
           if let pixelBuffer = pixelBuffer where status == 0 {
             let managedPixelBuffer = pixelBuffer
-            
+        
             fillPixelBufferFromImage(image, pixelBuffer: managedPixelBuffer)
-            appendSucceeded = pixelBufferAdaptor.appendPixelBuffer(managedPixelBuffer, withPresentationTime: presentationTime)
+            appendSucceeded = pixelBufferAdaptor.appendPixelBuffer(pixelBuffer, withPresentationTime: presentationTime)
             
           } else {
             NSLog("error: Failed to allocate pixel buffer from pool")
           }
-      }
+       }
     }
     
     return appendSucceeded
