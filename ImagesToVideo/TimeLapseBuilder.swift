@@ -27,6 +27,8 @@ public class TimeLapseBuilder: NSObject {
     let outputSize = CGSize(width: 600, height: 600)
     var error: NSError?
     
+    let startTime = NSDate.timeIntervalSinceReferenceDate()
+    
     let fileManager = NSFileManager.defaultManager()
     let urls = fileManager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
     guard let documentDirectory: NSURL = urls.first else {
@@ -63,8 +65,6 @@ public class TimeLapseBuilder: NSObject {
       kCVPixelBufferPixelFormatTypeKey as String: NSNumber(unsignedInt: kCVPixelFormatType_32ARGB),
       kCVPixelBufferWidthKey as String: NSNumber(float: Float(inputSize.width)),
       kCVPixelBufferHeightKey as String: NSNumber(float: Float(inputSize.height)),
-//      kCVPixelBufferCGImageCompatibilityKey as String: NSNumber(bool: true),
-//      kCVPixelBufferCGBitmapContextCompatibilityKey as String: NSNumber(bool: true)
     ]
     
     let pixelBufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(
@@ -89,27 +89,40 @@ public class TimeLapseBuilder: NSObject {
         var frameCount: Int64 = 0
         var remainingPhotoURLs = [String](self.photoURLs)
         
-        while (videoWriterInput.readyForMoreMediaData && !remainingPhotoURLs.isEmpty) {
-          let nextPhotoURL = remainingPhotoURLs.removeAtIndex(0)
-          let lastFrameTime = CMTimeMake(frameCount, fps)
-          let presentationTime = frameCount == 0 ? lastFrameTime : CMTimeAdd(lastFrameTime, frameDuration)
+        
+        while (!remainingPhotoURLs.isEmpty) {
+          //print("\(videoWriterInput.readyForMoreMediaData) : \(remainingPhotoURLs.count)")
           
-          
-          if !self.appendPixelBufferForImageAtURL(nextPhotoURL, pixelBufferAdaptor: pixelBufferAdaptor, presentationTime: presentationTime) {
-            error = NSError(domain: kErrorDomain, code: kFailedToAppendPixelBufferError,
-              userInfo: [
-                "description": "AVAssetWriterInputPixelBufferAdapter failed to append pixel buffer",
-                "rawError": videoWriter.error ?? "(none)"
-              ])
+          if (videoWriterInput.readyForMoreMediaData) {
+            let nextPhotoURL = remainingPhotoURLs.removeAtIndex(0)
+            let lastFrameTime = CMTimeMake(frameCount, fps)
+            let presentationTime = frameCount == 0 ? lastFrameTime : CMTimeAdd(lastFrameTime, frameDuration)
             
-            break
+            
+            if !self.appendPixelBufferForImageAtURL(nextPhotoURL, pixelBufferAdaptor: pixelBufferAdaptor, presentationTime: presentationTime) {
+              error = NSError(domain: kErrorDomain, code: kFailedToAppendPixelBufferError,
+                userInfo: [
+                  "description": "AVAssetWriterInputPixelBufferAdapter failed to append pixel buffer",
+                  "rawError": videoWriter.error ?? "(none)"
+                ])
+              
+              break
+            }
+            
+            frameCount++
+            
+            //print("\(CMTimeGetSeconds(presentationTime)) : \(currentProgress.completedUnitCount)|\(currentProgress.totalUnitCount)")
+            
+            currentProgress.completedUnitCount = frameCount
+            progress(currentProgress)
           }
-          
-          frameCount++
-          
-          currentProgress.completedUnitCount = frameCount
-          progress(currentProgress)
         }
+        
+        let endTime = NSDate.timeIntervalSinceReferenceDate()
+        let elapsedTime: NSTimeInterval = endTime - startTime
+        
+        print("rendering time \(self.stringFromTimeInterval(elapsedTime))")
+
         
         videoWriterInput.markAsFinished()
         videoWriter.finishWritingWithCompletionHandler { () -> Void in
@@ -118,6 +131,8 @@ public class TimeLapseBuilder: NSObject {
           }
         }
       })
+      
+
     } else {
       error = NSError(domain: kErrorDomain, code: kFailedToStartAssetWriterError,
         userInfo: ["description": "AVAssetWriter failed to start writing"]
@@ -165,4 +180,22 @@ public class TimeLapseBuilder: NSObject {
     CGContextDrawImage(context, CGRectMake(0, 0, CGFloat(CGImageGetWidth(image)), CGFloat(CGImageGetHeight(image))), image)
     CVPixelBufferUnlockBaseAddress(pixelBuffer, 0)
   }
+  
+  
+  func stringFromTimeInterval(interval: NSTimeInterval) -> String {
+    let ti = NSInteger(interval)
+    let ms = Int((interval % 1) * 1000)
+    let seconds = ti % 60
+    let minutes = (ti / 60) % 60
+    let hours = (ti / 3600)
+    
+    if hours > 0 {
+      return NSString(format: "%0.2d:%0.2d:%0.2d.%0.2d", hours, minutes, seconds, ms) as String
+    }else if minutes > 0 {
+      return NSString(format: "%0.2d:%0.2d.%0.2d", minutes, seconds, ms) as String
+    }else {
+      return NSString(format: "%0.2d.%0.2d", seconds, ms) as String
+    }
+  }
+
 }

@@ -16,7 +16,7 @@ class ViewController: UIViewController {
     let path = NSBundle.mainBundle().pathForResource("hasselblad-01", ofType: "jpg")!
     
     var photosArray = [String]()
-    for _ in 0...30 {
+    for _ in 0...500 {
       photosArray.append(path)
     }
     
