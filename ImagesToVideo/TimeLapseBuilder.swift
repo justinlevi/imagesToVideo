@@ -12,9 +12,6 @@ let kErrorDomain = "TimeLapseBuilder"
 let kFailedToStartAssetWriterError = 0
 let kFailedToAppendPixelBufferError = 1
 
-let kVideoWidth = 320
-let kVideoHeight = 240
-
 public class TimeLapseBuilder: NSObject {
   let photoURLs: [String]
   var videoWriter: AVAssetWriter?
@@ -24,11 +21,10 @@ public class TimeLapseBuilder: NSObject {
     
     super.init()
   }
-
   
   public func build(progress: (NSProgress -> Void), success: (NSURL -> Void), failure: (NSError -> Void)) {
-    let inputSize = CGSize(width: kVideoWidth, height: kVideoHeight)
-    let outputSize = CGSize(width: kVideoWidth, height: kVideoHeight)
+    let inputSize = CGSize(width: 600, height: 600)
+    let outputSize = CGSize(width: 600, height: 600)
     var error: NSError?
     
     let fileManager = NSFileManager.defaultManager()
@@ -64,9 +60,11 @@ public class TimeLapseBuilder: NSObject {
     let videoWriterInput = AVAssetWriterInput(mediaType: AVMediaTypeVideo, outputSettings: outputSettings)
     
     let sourcePixelBufferAttributesDictionary = [
-      kCVPixelBufferPixelFormatTypeKey as String: NSNumber(unsignedInt: kCVPixelFormatType_32BGRA),
+      kCVPixelBufferPixelFormatTypeKey as String: NSNumber(unsignedInt: kCVPixelFormatType_32ARGB),
       kCVPixelBufferWidthKey as String: NSNumber(float: Float(inputSize.width)),
-      kCVPixelBufferHeightKey as String: NSNumber(float: Float(inputSize.height))
+      kCVPixelBufferHeightKey as String: NSNumber(float: Float(inputSize.height)),
+//      kCVPixelBufferCGImageCompatibilityKey as String: NSNumber(bool: true),
+//      kCVPixelBufferCGBitmapContextCompatibilityKey as String: NSNumber(bool: true)
     ]
     
     let pixelBufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(
@@ -98,14 +96,11 @@ public class TimeLapseBuilder: NSObject {
           
           
           if !self.appendPixelBufferForImageAtURL(nextPhotoURL, pixelBufferAdaptor: pixelBufferAdaptor, presentationTime: presentationTime) {
-            error = NSError(
-              domain: kErrorDomain,
-              code: kFailedToAppendPixelBufferError,
+            error = NSError(domain: kErrorDomain, code: kFailedToAppendPixelBufferError,
               userInfo: [
                 "description": "AVAssetWriterInputPixelBufferAdapter failed to append pixel buffer",
                 "rawError": videoWriter.error ?? "(none)"
-              ]
-            )
+              ])
             
             break
           }
@@ -124,19 +119,15 @@ public class TimeLapseBuilder: NSObject {
         }
       })
     } else {
-      error = NSError(
-        domain: kErrorDomain,
-        code: kFailedToStartAssetWriterError,
+      error = NSError(domain: kErrorDomain, code: kFailedToStartAssetWriterError,
         userInfo: ["description": "AVAssetWriter failed to start writing"]
       )
     }
-    
     
     if let error = error {
       failure(error)
     }
   }
-  
   
   public func appendPixelBufferForImageAtURL(urlString: String, pixelBufferAdaptor: AVAssetWriterInputPixelBufferAdaptor, presentationTime: CMTime) -> Bool {
     var appendSucceeded = true
@@ -145,16 +136,13 @@ public class TimeLapseBuilder: NSObject {
       if let image = UIImage(contentsOfFile: urlString) {
         
           var pixelBuffer: CVPixelBuffer? = nil
-          let status: CVReturn = CVPixelBufferPoolCreatePixelBuffer(
-            kCFAllocatorDefault,
-            pixelBufferAdaptor.pixelBufferPool!,
-            &pixelBuffer
-          )
-        
+          let status: CVReturn = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pixelBufferAdaptor.pixelBufferPool!, &pixelBuffer)
+      
           if let pixelBuffer = pixelBuffer where status == 0 {
             let managedPixelBuffer = pixelBuffer
         
-            fillPixelBufferFromImage(image, pixelBuffer: managedPixelBuffer)
+            fillPixelBufferFromImage(image.CGImage!, pixelBuffer: managedPixelBuffer)
+            
             appendSucceeded = pixelBufferAdaptor.appendPixelBuffer(pixelBuffer, withPresentationTime: presentationTime)
             
           } else {
@@ -166,27 +154,15 @@ public class TimeLapseBuilder: NSObject {
     return appendSucceeded
   }
   
-  public func fillPixelBufferFromImage(image: UIImage, pixelBuffer: CVPixelBufferRef) {
-    //let imageData = CGDataProviderCopyData(CGImageGetDataProvider(image.CGImage))
-    //let lockStatus = CVPixelBufferLockBaseAddress(pixelBuffer, 0)
+
+  func fillPixelBufferFromImage(image: CGImage, pixelBuffer: CVPixelBuffer){
+    let frameSize = CGSizeMake(CGFloat(CGImageGetWidth(image)), CGFloat(CGImageGetHeight(image)))
     
-    let pixelData = CVPixelBufferGetBaseAddress(pixelBuffer)
-    
-    
+    CVPixelBufferLockBaseAddress(pixelBuffer, 0)
+    let data = CVPixelBufferGetBaseAddress(pixelBuffer)
     let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
-    
-    let context = CGBitmapContextCreate(
-      pixelData,
-      Int(image.size.width),
-      Int(image.size.height),
-      8,
-      Int(4 * image.size.width),
-      rgbColorSpace,
-      CGImageAlphaInfo.PremultipliedFirst.rawValue
-    )
-    
-    CGContextDrawImage(context, CGRectMake(0, 0, image.size.width, image.size.height), image.CGImage)
-    
+    let context = CGBitmapContextCreate(data, Int(frameSize.width), Int(frameSize.height), 8, CVPixelBufferGetBytesPerRow(pixelBuffer), rgbColorSpace, CGImageAlphaInfo.PremultipliedFirst.rawValue)
+    CGContextDrawImage(context, CGRectMake(0, 0, CGFloat(CGImageGetWidth(image)), CGFloat(CGImageGetHeight(image))), image)
     CVPixelBufferUnlockBaseAddress(pixelBuffer, 0)
   }
 }
