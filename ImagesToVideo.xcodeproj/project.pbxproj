@@ -13,10 +13,12 @@
 		E2B7A3711BA2050400E07D7A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2B7A3701BA2050400E07D7A /* Assets.xcassets */; };
 		E2B7A3741BA2050400E07D7A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E2B7A3721BA2050400E07D7A /* LaunchScreen.storyboard */; };
 		E2B7A37C1BA2051800E07D7A /* TimeLapseBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2B7A37B1BA2051800E07D7A /* TimeLapseBuilder.swift */; settings = {ASSET_TAGS = (); }; };
+		E2F2E9951BA8EC5A0061D2B2 /* UIImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29B2F101BA8E99C00800388 /* UIImageExtension.swift */; settings = {ASSET_TAGS = (); }; };
 		E2FD8E571BA461CA00483FF6 /* hasselblad-01.jpg in Resources */ = {isa = PBXBuildFile; fileRef = E2FD8E561BA461CA00483FF6 /* hasselblad-01.jpg */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E29B2F101BA8E99C00800388 /* UIImageExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIImageExtension.swift; path = "ui-image-extension/UIImageExtension.swift"; sourceTree = "<group>"; };
 		E2B7A3661BA2050400E07D7A /* ImagesToVideo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImagesToVideo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2B7A3691BA2050400E07D7A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E2B7A36B1BA2050400E07D7A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -62,6 +64,7 @@
 				E2B7A3691BA2050400E07D7A /* AppDelegate.swift */,
 				E2B7A36B1BA2050400E07D7A /* ViewController.swift */,
 				E2B7A37B1BA2051800E07D7A /* TimeLapseBuilder.swift */,
+				E29B2F101BA8E99C00800388 /* UIImageExtension.swift */,
 				E2B7A36D1BA2050400E07D7A /* Main.storyboard */,
 				E2B7A3701BA2050400E07D7A /* Assets.xcassets */,
 				E2B7A3721BA2050400E07D7A /* LaunchScreen.storyboard */,
@@ -144,6 +147,7 @@
 				E2B7A37C1BA2051800E07D7A /* TimeLapseBuilder.swift in Sources */,
 				E2B7A36C1BA2050400E07D7A /* ViewController.swift in Sources */,
 				E2B7A36A1BA2050400E07D7A /* AppDelegate.swift in Sources */,
+				E2F2E9951BA8EC5A0061D2B2 /* UIImageExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

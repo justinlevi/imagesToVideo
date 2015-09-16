@@ -19,12 +19,15 @@ class ViewController: UIViewController {
     let path = NSBundle.mainBundle().pathForResource("hasselblad-01", ofType: "jpg")!
     
     var photosArray = [String]()
-    for _ in 0...5000 {
+    
+    for _ in 0...1000 {
       photosArray.append(path)
     }
     
     let tlb = TimeLapseBuilder(photoURLs: photosArray)
-    tlb.build({ (progress) -> Void in
+    
+    
+    tlb.build(outputSize: CGSizeMake(320, 240), progress: { (progress) -> Void in
       
       dispatch_async(dispatch_get_main_queue()){
         self.progressLabel.text = "rendering \(progress.completedUnitCount) of \(progress.totalUnitCount) frames"
@@ -33,6 +36,12 @@ class ViewController: UIViewController {
       
       }, success: { (url) -> Void in
         print("SUCCESS: \(url)")
+        dispatch_async(dispatch_get_main_queue()){
+        self.progressLabel.hidden = true
+        self.progressView.hidden = true
+          
+          }
+        
       }) { (error) -> Void in
         print(error)
     }

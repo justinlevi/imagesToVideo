@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "81255257613BEA1B1DE955833D8688E41CE1C442",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "81255257613BEA1B1DE955833D8688E41CE1C442" : 0,
+    "8363316D2A234F91A495AFE59B2DECA725699594" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "62191DA9-0AE0-4FC5-AE83-AFFF2D603C31",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "81255257613BEA1B1DE955833D8688E41CE1C442" : "ImagesToVideo\/",
+    "8363316D2A234F91A495AFE59B2DECA725699594" : "ImagesToVideo\/ImagesToVideo\/ui-image-extension\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "ImagesToVideo",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "ImagesToVideo.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:justinlevi\/imagesToVideo.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "81255257613BEA1B1DE955833D8688E41CE1C442"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:justinlevi\/ui-image-extension.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "8363316D2A234F91A495AFE59B2DECA725699594"
+    }
+  ]
+}

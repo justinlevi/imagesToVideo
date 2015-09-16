@@ -15,6 +15,7 @@ let kFailedToAppendPixelBufferError = 1
 public class TimeLapseBuilder: NSObject {
   let photoURLs: [String]
   var videoWriter: AVAssetWriter?
+  var outputSize = CGSizeMake(1920, 1080)
   
   public init(photoURLs: [String]) {
     self.photoURLs = photoURLs
@@ -22,9 +23,9 @@ public class TimeLapseBuilder: NSObject {
     super.init()
   }
   
-  public func build(progress: (NSProgress -> Void), success: (NSURL -> Void), failure: (NSError -> Void)) {
-    let inputSize = CGSize(width: 600, height: 600)
-    let outputSize = CGSize(width: 600, height: 600)
+  public func build(outputSize outputSize: CGSize, progress: (NSProgress -> Void), success: (NSURL -> Void), failure: (NSError -> Void)) {
+
+    self.outputSize = outputSize
     var error: NSError?
     
     let startTime = NSDate.timeIntervalSinceReferenceDate()
@@ -63,8 +64,8 @@ public class TimeLapseBuilder: NSObject {
     
     let sourcePixelBufferAttributesDictionary = [
       kCVPixelBufferPixelFormatTypeKey as String: NSNumber(unsignedInt: kCVPixelFormatType_32ARGB),
-      kCVPixelBufferWidthKey as String: NSNumber(float: Float(inputSize.width)),
-      kCVPixelBufferHeightKey as String: NSNumber(float: Float(inputSize.height)),
+      kCVPixelBufferWidthKey as String: NSNumber(float: Float(outputSize.width)),
+      kCVPixelBufferHeightKey as String: NSNumber(float: Float(outputSize.height)),
     ]
     
     let pixelBufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(
@@ -148,36 +149,59 @@ public class TimeLapseBuilder: NSObject {
     var appendSucceeded = true
     
     autoreleasepool {
-      if let image = UIImage(contentsOfFile: urlString) {
-        
-          var pixelBuffer: CVPixelBuffer? = nil
-          let status: CVReturn = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pixelBufferAdaptor.pixelBufferPool!, &pixelBuffer)
       
-          if let pixelBuffer = pixelBuffer where status == 0 {
-            let managedPixelBuffer = pixelBuffer
-        
-            fillPixelBufferFromImage(image.CGImage!, pixelBuffer: managedPixelBuffer)
-            
-            appendSucceeded = pixelBufferAdaptor.appendPixelBuffer(pixelBuffer, withPresentationTime: presentationTime)
-            
-          } else {
-            NSLog("error: Failed to allocate pixel buffer from pool")
-          }
-       }
+      if let image = UIImage(contentsOfFile: urlString) {
+        var pixelBuffer: CVPixelBuffer? = nil
+        let status: CVReturn = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pixelBufferAdaptor.pixelBufferPool!, &pixelBuffer)
+
+        if let pixelBuffer = pixelBuffer where status == 0 {
+          let managedPixelBuffer = pixelBuffer
+
+          fillPixelBufferFromImage(image, pixelBuffer: managedPixelBuffer, contentMode: UIViewContentMode.ScaleAspectFit)
+
+          appendSucceeded = pixelBufferAdaptor.appendPixelBuffer(pixelBuffer, withPresentationTime: presentationTime)
+
+        } else {
+          NSLog("error: Failed to allocate pixel buffer from pool")
+        }
+      }
     }
     
     return appendSucceeded
   }
   
+  // http://stackoverflow.com/questions/7645454
 
-  func fillPixelBufferFromImage(image: CGImage, pixelBuffer: CVPixelBuffer){
-    let frameSize = CGSizeMake(CGFloat(CGImageGetWidth(image)), CGFloat(CGImageGetHeight(image)))
-    
+  func fillPixelBufferFromImage(image: UIImage, pixelBuffer: CVPixelBuffer, contentMode:UIViewContentMode){
+
     CVPixelBufferLockBaseAddress(pixelBuffer, 0)
+    
     let data = CVPixelBufferGetBaseAddress(pixelBuffer)
     let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
-    let context = CGBitmapContextCreate(data, Int(frameSize.width), Int(frameSize.height), 8, CVPixelBufferGetBytesPerRow(pixelBuffer), rgbColorSpace, CGImageAlphaInfo.PremultipliedFirst.rawValue)
-    CGContextDrawImage(context, CGRectMake(0, 0, CGFloat(CGImageGetWidth(image)), CGFloat(CGImageGetHeight(image))), image)
+    let context = CGBitmapContextCreate(data, Int(self.outputSize.width), Int(self.outputSize.height), 8, CVPixelBufferGetBytesPerRow(pixelBuffer), rgbColorSpace, CGImageAlphaInfo.PremultipliedFirst.rawValue)
+    
+    CGContextClearRect(context, CGRectMake(0, 0, CGFloat(self.outputSize.width), CGFloat(self.outputSize.height)))
+    
+    let horizontalRatio = CGFloat(self.outputSize.width) / image.size.width
+    let verticalRatio = CGFloat(self.outputSize.height) / image.size.height
+    var ratio: CGFloat = 1
+    
+    switch(contentMode) {
+    case .ScaleAspectFill:
+      ratio = max(horizontalRatio, verticalRatio)
+    case .ScaleAspectFit:
+      ratio = min(horizontalRatio, verticalRatio)
+    default:
+      ratio = min(horizontalRatio, verticalRatio)
+    }
+    
+    let newSize:CGSize = CGSizeMake(image.size.width * ratio, image.size.height * ratio)
+    
+    let x = newSize.width < self.outputSize.width ? (self.outputSize.width - newSize.width) / 2 : 0
+    let y = newSize.height < self.outputSize.height ? (self.outputSize.height - newSize.height) / 2 : 0
+    
+    CGContextDrawImage(context, CGRectMake(x, y, newSize.width, newSize.height), image.CGImage)
+    
     CVPixelBufferUnlockBaseAddress(pixelBuffer, 0)
   }
   
